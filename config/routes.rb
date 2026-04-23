@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
+  # アプリを開いたら、いきなりボタン画面（index）が出るようにする
+  root "sales#index"
+  
+  # 売上記録用のルート
+  resources :sales, only: [:index, :create, :destroy] do
+    collection do
+      get :manage # 管理画面用
+    end
+  end
 end

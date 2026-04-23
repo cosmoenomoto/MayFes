@@ -1,0 +1,27 @@
+<div class="max-w-md mx-auto p-4">
+  <h1 class="text-2xl font-bold text-center mb-6">売上履歴・分析</h1>
+  
+  <div class="bg-blue-50 p-4 rounded-lg mb-8 text-center">
+    <p class="text-gray-600">現在の総売上</p>
+    <p class="text-3xl font-bold text-blue-600"><%= number_to_currency(@total_amount, unit: "¥", precision: 0) %></p>
+  </div>
+
+  <div class="space-y-4">
+    <h2 class="font-bold border-b pb-2">販売履歴（最新順）</h2>
+    <% @sales.each do |sale| %>
+      <div class="flex justify-between items-center bg-white p-3 border rounded shadow-sm">
+        <div>
+          <div class="font-bold"><%= sale.item_type_jp %> (<%= sale.price %>円)</div>
+          <div class="text-xs text-gray-500">
+            <%= sale.gender_jp %> / <%= sale.age_group_jp %> - <%= sale.created_at.strftime("%H:%M") %>
+          </div>
+        </div>
+        <%= button_to "消去", sale_path(sale), method: :delete, data: { confirm: "削除しますか？" }, class: "text-red-500 text-sm border border-red-500 px-2 py-1 rounded" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8">
+    <%= link_to '← レジ画面に戻る', root_path, class: "text-gray-600" %>
+  </div>
+</div>
