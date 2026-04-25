@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
 
-# Rails特有の問題（サーバーが異常終了した時に残るpidファイル）を削除
+# 1. Rails特有の問題（PIDファイル）を削除
 rm -f /app/tmp/pids/server.pid
 
-# 最後に、コンテナのメインプロセス（CMDで指定した内容）を実行
+# 2. 【重要】データベースの「棚」を自動で作る・更新する
+# これがないと "relation 'sales' does not exist" エラーが直りません
+bundle exec rails db:migrate
+
+# 3. 最後に、コンテナのメインプロセス（CMDで指定した内容）を実行
 exec "$@"
