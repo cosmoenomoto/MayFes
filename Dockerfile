@@ -14,6 +14,8 @@ RUN bundle install
 
 COPY . /app
 
+RUN bundle exec rake assets:precompile RAILS_ENV=production
+
 # Rails起動用スクリプト（entrypoint.sh）をコピーして実行権限を付与
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
