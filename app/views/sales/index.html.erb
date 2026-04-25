@@ -1,41 +1,60 @@
-<div class="max-w-md mx-auto p-4">
-  <h1 class="text-2xl font-bold text-center mb-6">五月祭レジ記録</h1>
+<div class="max-w-md mx-auto p-6 bg-gray-50 min-h-screen">
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-xl font-extrabold text-gray-800 tracking-tight">MayFest POS 2026</h1>
+    <div class="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">LIVE</div>
+  </header>
 
   <% if notice %>
-    <div class="mb-4 p-2 bg-green-100 text-green-700 text-center rounded"><%= notice %></div>
+    <div class="fixed top-4 left-1/2 -translate-x-1/2 w-80 z-50 bg-white shadow-2xl border-l-4 border-green-500 p-4 rounded-lg flex items-center gap-3 animate-bounce">
+      <span class="text-green-500 font-bold">✓</span>
+      <span class="text-sm font-medium"><%= notice %></span>
+    </div>
   <% end %>
 
-  <div class="mb-6 p-2 bg-gray-100 rounded">
-    <p class="text-sm text-gray-600">直近の記録: 
-      <% @sales.each do |s| %>
-        <span class="inline-block bg-white px-2 py-1 rounded mr-1 shadow-sm text-xs">
-          <%= s.item_type_jp %> | <%= s.gender_jp %>
-        </span>
+  <div class="mb-8 overflow-x-auto">
+    <p class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Recent Sales</p>
+    <div class="flex gap-2">
+      <% @sales.first(5).each do |s| %>
+        <div class="flex-shrink-0 bg-white border border-gray-100 px-3 py-2 rounded-2xl shadow-sm text-[10px] font-bold">
+          <span class="text-blue-600"><%= s.item_type_jp %></span>
+          <span class="text-gray-300 mx-1">|</span>
+          <span class="text-gray-500"><%= s.gender_jp %></span>
+        </div>
       <% end %>
-    </p>
+    </div>
   </div>
 
-  <div class="grid grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 gap-6">
     <% [
-      { name: '商品A', type: 'item_a', price: 500, color: 'bg-blue-500' },
-      { name: '商品B', type: 'item_b', price: 700, color: 'bg-red-500' }
+      { name: '商品A', type: 'item_a', price: 500, color: 'from-blue-500 to-blue-700' },
+      { name: '商品B', type: 'item_b', price: 700, color: 'from-rose-500 to-rose-700' }
     ].each do |item| %>
       
-      <% ['male', 'female'].each do |gender| %>
-        <% ['young', 'adult'].each do |age| %>
-          <%= button_to sales_path(sale: { item_type: item[:type], gender: gender, age_group: age, price: item[:price] }), 
-              class: "#{item[:color]} text-white h-24 rounded-xl shadow-lg active:scale-95 transition-transform text-sm font-bold flex flex-col justify-center items-center w-full" do %>
-            <div class="text-lg"><%= item[:name] %></div>
-            <div><%= gender == 'male' ? '♂ 男' : '♀ 女' %> / <%= age == 'young' ? '10-20' : '30+' %></div>
-            <div class="opacity-80"><%= item[:price] %>円</div>
-          <% end %>
-        <% end %>
-      <% end %>
+      <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center mb-4 px-2">
+          <span class="text-lg font-black text-gray-800"><%= item[:name] %></span>
+          <span class="bg-gray-100 px-3 py-1 rounded-full text-sm font-bold text-gray-600"><%= item[:price] %>円</span>
+        </div>
 
+        <div class="grid grid-cols-2 gap-3">
+          <% [ ['male', '♂ 男'], ['female', '♀ 女'] ].each do |g_key, g_name| %>
+            <% [ ['young', '10-20'], ['adult', '30+'] ].each do |a_key, a_name| %>
+              <%= button_to sales_path(sale: { item_type: item[:type], gender: g_key, age_group: a_key, price: item[:price] }), 
+                  class: "relative overflow-hidden bg-gradient-to-br #{item[:color]} text-white p-4 rounded-2xl shadow-md active:scale-95 transition-all text-left group" do %>
+                <div class="text-xs opacity-70 font-bold mb-1"><%= a_name %></div>
+                <div class="text-sm font-black"><%= g_name %></div>
+                <div class="absolute -right-2 -bottom-2 text-4xl opacity-10 group-active:scale-125 transition-transform">💰</div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
     <% end %>
   </div>
 
-  <div class="mt-10 text-center">
-    <%= link_to '売上履歴・集計を確認する', manage_sales_path, class: "text-blue-600 underline" %>
+  <div class="mt-12 mb-8 px-4">
+    <%= link_to manage_sales_path, class: "flex items-center justify-center gap-2 bg-gray-900 text-white w-full py-4 rounded-2xl font-bold shadow-xl hover:bg-black transition-colors" do %>
+      📊 <span>売上分析レポートを見る</span>
+    <% end %>
   </div>
 </div>
