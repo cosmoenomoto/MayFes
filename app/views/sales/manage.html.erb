@@ -1,47 +1,49 @@
-<div class="max-w-md mx-auto p-6 bg-gray-50 min-h-screen">
-  <div class="flex items-center gap-4 mb-8">
-    <%= link_to root_path, class: "bg-white p-3 rounded-2xl shadow-sm" do %> ⬅️ <% end %>
-    <h1 class="text-xl font-black text-gray-800">Analytics</h1>
-  </div>
+<div class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-indigo-900 p-4 md:p-10 flex flex-col items-center">
   
-  <div class="bg-white p-8 rounded-[2rem] shadow-xl shadow-blue-100 border border-blue-50 mb-10 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 z-0"></div>
-    <div class="relative z-10 text-center">
-      <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Total Revenue</p>
-      <p class="text-5xl font-black text-blue-600 tracking-tighter">
-        <%= number_to_currency(@total_amount, unit: "¥", precision: 0) %>
-      </p>
+  <div class="w-full max-w-xl bg-white/95 backdrop-blur-sm p-10 rounded-[2.5rem] shadow-2xl border border-white/20">
+    <div class="flex items-center gap-5 mb-10 text-center justify-center">
+      <%= link_to root_path, class: "bg-gray-50 p-4 rounded-3xl shadow-sm border border-gray-100" do %> ⬅️ <% end %>
+      <h1 class="text-5xl font-black text-gray-950 tracking-tighter italic">Analytics</h1>
     </div>
-  </div>
-
-  <div class="space-y-4">
-    <div class="flex justify-between items-end mb-4">
-      <h2 class="font-black text-gray-800 text-lg italic">Timeline</h2>
-      <span class="text-xs font-bold text-gray-400"><%= @sales.count %> Transactions</span>
+    
+    <div class="bg-gradient-to-br from-gray-950 to-gray-800 p-12 rounded-[2.5rem] shadow-2xl border-4 border-white mb-14 relative overflow-hidden text-center">
+      <div class="relative z-10 text-center">
+        <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2">Total Revenue</p>
+        <p class="text-7xl md:text-8xl font-black text-white tracking-tighter animate-pulse">
+          <%= number_to_currency(@total_amount, unit: "¥", precision: 0) %>
+        </p>
+      </div>
     </div>
 
-    <% @sales.each do |sale| %>
-      <div class="group flex justify-between items-center bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-xl">
-            <%= sale.item_type == 'item_a' ? '🍕' : '🥤' %>
-          </div>
-          <div>
-            <div class="font-black text-gray-800"><%= sale.item_type_jp %></div>
-            <div class="text-[10px] font-bold text-gray-400 flex gap-2">
-              <span class="text-blue-500 uppercase"><%= sale.gender_jp %></span>
-              <span>•</span>
-              <span><%= sale.created_at.strftime("%H:%M") %></span>
+    <div class="space-y-5">
+      <div class="flex justify-between items-end mb-6 text-center">
+        <h2 class="font-black text-gray-900 text-2xl italic">Timeline</h2>
+        <span class="text-xs font-bold text-gray-400 tracking-wider"><%= @sales.count %> Transactions</span>
+      </div>
+
+      <% @sales.each do |sale| %>
+        <div class="group flex justify-between items-center bg-gray-50 p-6 rounded-[2rem] border border-gray-100 shadow-inner hover:shadow-lg transition-shadow">
+          <div class="flex items-center gap-5">
+            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-3xl shadow-sm">
+              <%= sale.item_type == 'item_a' ? '🍕' : '🥤' %>
+            </div>
+            <div>
+              <div class="text-lg font-black text-gray-900"><%= sale.item_type_jp %></div>
+              <div class="text-[11px] font-bold text-gray-400 flex gap-2">
+                <span class="text-blue-600 uppercase tracking-wider"><%= sale.gender_jp %></span>
+                <span>•</span>
+                <span><%= sale.created_at.strftime("%H:%M") %></span>
+              </div>
             </div>
           </div>
+          <div class="flex flex-col items-end gap-3">
+            <div class="text-lg font-black text-gray-950 tracking-tight">¥<%= sale.price %></div>
+            <%= button_to sale_path(sale), method: :delete, data: { confirm: "削除しますか？" }, class: "opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-bold bg-rose-50 text-rose-500 px-4 py-1 rounded-full shadow-sm" do %>
+              DELETE
+            <% end %>
+          </div>
         </div>
-        <div class="flex flex-col items-end gap-2">
-          <div class="font-black text-gray-800">¥<%= sale.price %></div>
-          <%= button_to sale_path(sale), method: :delete, data: { confirm: "削除しますか？" }, class: "opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold bg-rose-50 text-rose-500 px-3 py-1 rounded-full" do %>
-            DELETE
-          <% end %>
-        </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 </div>
