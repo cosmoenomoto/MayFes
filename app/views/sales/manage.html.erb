@@ -28,12 +28,15 @@
       <div class="timeline-list">
         <% @sales.each do |sale| %>
           <div class="timeline-row">
-            <div class="row-icon" style="--icon-bg: <%= sale.item_type == 'item_a' ? '#2563eb' : '#dc2626' %>">
-              <%= sale.item_type == 'item_a' ? '☕️' : '☕️' %>
+            <% icon_bg = sale.item_type == 'item_a' ? '#2563eb' : sale.item_type == 'item_b' ? '#dc2626' : '#059669' %>
+            <% icon_emoji = sale.item_type == 'item_a' ? '☕️' : sale.item_type == 'item_b' ? '☕️' : '🎟️' %>
+            <% display_name = sale.item_type == 'option' ? "オプション (¥#{sale.price})" : sale.item_type_jp %>
+            <div class="row-icon" style="--icon-bg: <%= icon_bg %>">
+              <%= icon_emoji %>
             </div>
 
             <div class="row-info">
-              <div class="row-name"><%= sale.item_type_jp %></div>
+              <div class="row-name"><%= display_name %></div>
               <div class="row-meta">
                 <span class="meta-gender"><%= sale.gender_jp %></span>
                 <span class="meta-dot">·</span>
