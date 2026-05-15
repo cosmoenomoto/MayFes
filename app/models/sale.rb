@@ -5,7 +5,7 @@ class Sale < ApplicationRecord
 
   # 日本語表示用のメソッド（Viewをスッキリさせるため）
   def item_type_jp
-    { 'item_a' => '大サイズ', 'item_b' => '小サイズ' 'option' => 'オプション'}[item_type]
+    { 'item_a' => '大サイズ', 'item_b' => '小サイズ','option' => 'オプション'}[item_type]
   end
 
   def gender_jp
