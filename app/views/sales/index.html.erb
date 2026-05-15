@@ -1,35 +1,32 @@
 <div class="pos-root">
   <div class="pos-bg"></div>
-
-  <div class="pos-card">
-    <header class="pos-header">
-      <div class="pos-logo">
-        <span class="pos-logo-main">五月祭会計</span>
-        <span class="pos-logo-badge">2026</span>
-      </div>
-    </header>
-
-    <% if notice %>
+<div class="pos-card">
+<header class="pos-header">
+<div class="pos-logo">
+<span class="pos-logo-main">五月祭会計</span>
+<span class="pos-logo-badge">2026</span>
+</div>
+</header>
+<% if notice %>
       <div class="pos-notice">
-        <span class="pos-notice-icon">⚡</span>
-        <span><%= notice %></span>
-      </div>
-    <% end %>
-
+<span class="pos-notice-icon">⚡</span>
+<span><%= notice %></span>
+</div>
+<% end %>
     <section class="pos-feed">
-      <p class="pos-feed-label">RECENT SALES</p>
-      <div class="pos-feed-scroll">
-        <% @sales.first(5).each do |s| %>
+<p class="pos-feed-label">RECENT SALES</p>
+<div class="pos-feed-scroll">
+<% @sales.first(5).each do |s| %>
           <div class="pos-feed-chip">
-            <span class="chip-type"><%= s.item_type_jp %></span>
-            <span class="chip-sep">/</span>
-            <span class="chip-gender"><%= s.gender_jp %></span>
-          </div>
-        <% end %>
+<span class="chip-type"><%= s.item_type_jp %></span>
+<span class="chip-sep">/</span>
+<span class="chip-gender"><%= s.gender_jp %></span>
+</div>
+<% end %>
       </div>
-    </section>
+</section>
 
-    <% [
+<% [
       { name: '大サイズ', type: 'item_a', price: 1000, accent: '#2563eb', emoji: '☕️' },
       { name: '小サイズ', type: 'item_b', price: 500, accent: '#dc2626', emoji: '☕️' }
     ].each do |item| %>
@@ -41,7 +38,6 @@
           </div>
           <div class="pos-item-price">¥<%= item[:price] %></div>
         </div>
-
         <div class="pos-grid">
           <% [ ['male', '♂ 男'], ['female', '♀ 女'] ].each do |g_key, g_name| %>
             <% [ ['young', '10代・20代'], ['adult', '30代以上'] ].each do |a_key, a_name| %>
@@ -61,6 +57,50 @@
       </section>
     <% end %>
 
+    <%# ===== OPTION SECTION ===== %>
+    <section class="pos-item pos-option-section" style="--accent: #059669">
+      <div class="pos-item-header">
+        <div class="pos-item-title">
+          <span class="item-emoji" style="background: #059669;">🎟️</span>
+          <span class="item-name">オプション</span>
+        </div>
+        <div class="pos-item-price option-price-display" id="option-selected-price">金額選択</div>
+      </div>
+
+      <div class="option-price-grid">
+        <% [500, 1000, 1500, 2000, 2500, 3000].each do |p| %>
+          <button type="button"
+            class="option-price-btn"
+            data-price="<%= p %>"
+            onclick="selectOptionPrice(<%= p %>, this)">
+            ¥<%= p %>
+          </button>
+        <% end %>
+      </div>
+
+      <div class="option-submit-area" id="option-submit-area">
+        <p class="option-submit-label">対象を選択</p>
+        <div class="pos-grid">
+          <% [ ['male', '♂ 男'], ['female', '♀ 女'] ].each do |g_key, g_name| %>
+            <% [ ['young', '10代・20代'], ['adult', '30代以上'] ].each do |a_key, a_name| %>
+              <form action="<%= sales_path %>" method="post" id="opt-form-<%= g_key %>-<%= a_key %>">
+                <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+                <input type="hidden" name="sale[item_type]" value="option">
+                <input type="hidden" name="sale[gender]" value="<%= g_key %>">
+                <input type="hidden" name="sale[age_group]" value="<%= a_key %>">
+                <input type="hidden" name="sale[price]" value="0" id="opt-price-<%= g_key %>-<%= a_key %>">
+                <button type="submit" class="pos-btn option-submit-btn" style="width:100%">
+                  <span class="btn-age"><%= a_name %></span>
+                  <span class="btn-gender"><%= g_name %></span>
+                  <span class="btn-arrow">→</span>
+                </button>
+              </form>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
     <div class="pos-footer">
       <%= link_to manage_sales_path, class: "pos-manage-btn" do %>
         <span class="manage-icon">📊</span>
@@ -71,11 +111,27 @@
   </div>
 </div>
 
+<script>
+  function selectOptionPrice(price, btn) {
+    const display = document.getElementById('option-selected-price');
+    display.textContent = '¥' + price.toLocaleString('ja-JP');
+    display.classList.add('option-price-active');
+
+    document.querySelectorAll('.option-price-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    // Update all option form price inputs
+    document.querySelectorAll('[id^="opt-price-"]').forEach(input => {
+      input.value = price;
+    });
+
+    document.getElementById('option-submit-area').classList.add('visible');
+  }
+</script>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,900&family=Noto+Sans+JP:wght@400;700;900&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   .pos-root {
     min-height: 100svh;
     background: #0a0a0f;
@@ -87,7 +143,6 @@
     overflow: hidden;
     font-family: 'Noto Sans JP', sans-serif;
   }
-
   .pos-bg {
     position: fixed;
     inset: 0;
@@ -96,7 +151,6 @@
       radial-gradient(ellipse 60% 50% at 80% 100%, #7c3aed33 0%, transparent 60%);
     pointer-events: none;
   }
-
   .pos-card {
     width: 100%;
     max-width: 480px;
@@ -108,8 +162,6 @@
     position: relative;
     z-index: 1;
   }
-
-  /* HEADER */
   .pos-header {
     background: #0a0a0f;
     padding: 20px 24px 18px;
@@ -117,13 +169,7 @@
     align-items: center;
     justify-content: space-between;
   }
-
-  .pos-logo {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-  }
-
+  .pos-logo { display: flex; align-items: baseline; gap: 12px; }
   .pos-logo-main {
     font-family: 'Barlow Condensed', sans-serif;
     font-style: italic;
@@ -133,7 +179,6 @@
     letter-spacing: -0.02em;
     line-height: 1;
   }
-
   .pos-logo-badge {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
@@ -144,8 +189,6 @@
     padding: 3px 8px;
     border-radius: 2px;
   }
-
-  /* NOTICE */
   .pos-notice {
     background: #16a34a;
     color: #fff;
@@ -159,19 +202,15 @@
     animation: slideDown 0.3s ease;
   }
   .pos-notice-icon { font-size: 1.2rem; }
-
   @keyframes slideDown {
     from { transform: translateY(-100%); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
-
-  /* FEED */
   .pos-feed {
     padding: 16px 24px 12px;
     border-bottom: 2px solid #f1f5f9;
     background: #f8fafc;
   }
-
   .pos-feed-label {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
@@ -180,7 +219,6 @@
     color: #94a3b8;
     margin-bottom: 10px;
   }
-
   .pos-feed-scroll {
     display: flex;
     gap: 8px;
@@ -190,7 +228,6 @@
     padding-bottom: 2px;
   }
   .pos-feed-scroll::-webkit-scrollbar { display: none; }
-
   .pos-feed-chip {
     flex-shrink: 0;
     background: #fff;
@@ -203,32 +240,21 @@
     align-items: center;
     gap: 6px;
     white-space: nowrap;
-    transition: border-color 0.15s;
   }
-
   .chip-type { color: #1e40af; }
   .chip-sep { color: #cbd5e1; font-size: 0.6rem; }
   .chip-gender { color: #475569; }
-
-  /* ITEM SECTION */
   .pos-item {
     padding: 20px 24px;
     border-bottom: 2px solid #f1f5f9;
   }
-
   .pos-item-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 14px;
   }
-
-  .pos-item-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
+  .pos-item-title { display: flex; align-items: center; gap: 10px; }
   .item-emoji {
     width: 40px;
     height: 40px;
@@ -242,7 +268,6 @@
     box-shadow: 2px 2px 0 #0a0a0f;
     flex-shrink: 0;
   }
-
   .item-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-style: italic;
@@ -252,7 +277,6 @@
     letter-spacing: -0.01em;
     line-height: 1;
   }
-
   .pos-item-price {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
@@ -265,16 +289,13 @@
     line-height: 1.2;
     border-radius: 2px;
   }
-
-  /* GRID BUTTONS */
   .pos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
-
   .pos-btn {
-    background: none;
+    background: #fff;
     border: 2px solid #0a0a0f;
     box-shadow: 3px 3px 0 #0a0a0f;
     border-radius: 2px;
@@ -287,10 +308,8 @@
     position: relative;
     overflow: hidden;
     transition: all 0.1s ease;
-    background: #fff;
     min-height: 90px;
   }
-
   .pos-btn::before {
     content: '';
     position: absolute;
@@ -299,16 +318,10 @@
     opacity: 0;
     transition: opacity 0.15s;
   }
-
-  .pos-btn:active {
-    transform: translate(3px, 3px);
-    box-shadow: 0 0 0 #0a0a0f;
-  }
-
+  .pos-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #0a0a0f; }
   .pos-btn:active::before { opacity: 1; }
   .pos-btn:active .btn-age,
   .pos-btn:active .btn-gender { color: #fff; }
-
   .btn-age {
     font-size: 0.7rem;
     font-weight: 700;
@@ -318,7 +331,6 @@
     z-index: 1;
     transition: color 0.1s;
   }
-
   .btn-gender {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
@@ -329,7 +341,6 @@
     z-index: 1;
     transition: color 0.1s;
   }
-
   .btn-arrow {
     position: absolute;
     bottom: 10px;
@@ -341,12 +352,81 @@
     z-index: 1;
   }
 
-  /* FOOTER */
-  .pos-footer {
-    padding: 20px 24px;
-    background: #f8fafc;
+  /* ===== OPTION SECTION ===== */
+  .pos-option-section { background: #f0fdf4; }
+
+  .option-price-display {
+    background: #e2e8f0;
+    color: #64748b;
+    border-color: #94a3b8;
+    box-shadow: 2px 2px 0 #94a3b8;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .option-price-display.option-price-active {
+    background: #facc15;
+    color: #0a0a0f;
+    border-color: #0a0a0f;
+    box-shadow: 2px 2px 0 #0a0a0f;
+    font-size: 1.4rem;
   }
 
+  .option-price-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .option-price-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.05rem;
+    color: #0a0a0f;
+    background: #fff;
+    border: 2px solid #0a0a0f;
+    box-shadow: 3px 3px 0 #0a0a0f;
+    border-radius: 2px;
+    padding: 12px 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.1s ease;
+    letter-spacing: -0.01em;
+  }
+  .option-price-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 #0a0a0f;
+  }
+  .option-price-btn.selected {
+    background: #059669;
+    color: #fff;
+    border-color: #065f46;
+    box-shadow: 3px 3px 0 #065f46;
+  }
+
+  .option-submit-area {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.25s ease;
+    margin-top: 0;
+  }
+  .option-submit-area.visible {
+    max-height: 400px;
+    opacity: 1;
+    margin-top: 14px;
+  }
+  .option-submit-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: #6b7280;
+    margin-bottom: 10px;
+  }
+
+  /* Footer */
+  .pos-footer { padding: 20px 24px; background: #f8fafc; }
   .pos-manage-btn {
     display: flex;
     align-items: center;
@@ -365,20 +445,14 @@
     text-decoration: none;
     transition: all 0.1s ease;
   }
-
-  .pos-manage-btn:active {
-    transform: translate(4px, 4px);
-    box-shadow: 0 0 0 #334155;
-  }
-
+  .pos-manage-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #334155; }
   .manage-icon { font-size: 1.1rem; }
   .manage-arrow { margin-left: auto; font-size: 1.1rem; }
 
-  /* Hover states for non-touch */
   @media (hover: hover) {
     .pos-btn:hover::before { opacity: 0.08; }
     .pos-btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 #0a0a0f; }
+    .option-price-btn:hover:not(.selected) { background: #dcfce7; }
     .pos-manage-btn:hover { background: #1e293b; }
-    .pos-feed-chip:hover { border-color: #94a3b8; }
   }
 </style>
