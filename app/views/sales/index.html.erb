@@ -83,7 +83,7 @@
         <div class="pos-grid">
           <% [ ['male', '♂ 男'], ['female', '♀ 女'] ].each do |g_key, g_name| %>
             <% [ ['young', '10代・20代'], ['adult', '30代以上'] ].each do |a_key, a_name| %>
-              <form action="<%= sales_path %>" method="post" id="opt-form-<%= g_key %>-<%= a_key %>">
+             <form action="<%= sales_path %>" method="post" id="opt-form-<%= g_key %>-<%= a_key %>" data-turbo="true">
                 <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
                 <input type="hidden" name="sale[item_type]" value="option">
                 <input type="hidden" name="sale[gender]" value="<%= g_key %>">
