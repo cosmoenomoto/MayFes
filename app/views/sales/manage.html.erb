@@ -1,49 +1,361 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-indigo-900 p-4 md:p-10 flex flex-col items-center">
-  
-  <div class="w-full max-w-xl bg-white/95 backdrop-blur-sm p-10 rounded-[2.5rem] shadow-2xl border border-white/20">
-    <div class="flex items-center gap-5 mb-10 text-center justify-center">
-      <%= link_to root_path, class: "bg-gray-50 p-4 rounded-3xl shadow-sm border border-gray-100" do %> ⬅️ <% end %>
-      <h1 class="text-5xl font-black text-gray-950 tracking-tighter italic">Analytics</h1>
-    </div>
-    
-    <div class="bg-gradient-to-br from-gray-950 to-gray-800 p-12 rounded-[2.5rem] shadow-2xl border-4 border-white mb-14 relative overflow-hidden text-center">
-      <div class="relative z-10 text-center">
-        <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2">Total Revenue</p>
-        <p class="text-7xl md:text-8xl font-black text-white tracking-tighter animate-pulse">
-          <%= number_to_currency(@total_amount, unit: "¥", precision: 0) %>
-        </p>
-      </div>
-    </div>
+<div class="mgmt-root">
+  <div class="mgmt-bg"></div>
 
-    <div class="space-y-5">
-      <div class="flex justify-between items-end mb-6 text-center">
-        <h2 class="font-black text-gray-900 text-2xl italic">Timeline</h2>
-        <span class="text-xs font-bold text-gray-400 tracking-wider"><%= @sales.count %> Transactions</span>
+  <div class="mgmt-card">
+
+    <header class="mgmt-header">
+      <%= link_to root_path, class: "mgmt-back" do %>
+        ←
+      <% end %>
+      <div class="mgmt-logo">
+        <span class="mgmt-logo-text">Analytics</span>
+        <span class="mgmt-logo-tag">LIVE</span>
+      </div>
+    </header>
+
+    <section class="mgmt-revenue">
+      <p class="rev-label">TOTAL REVENUE</p>
+      <p class="rev-amount"><%= number_to_currency(@total_amount, unit: "¥", precision: 0) %></p>
+      <p class="rev-sub"><%= @sales.count %> transactions</p>
+    </section>
+
+    <section class="mgmt-timeline">
+      <div class="timeline-header">
+        <span class="timeline-title">Timeline</span>
+        <span class="timeline-count"><%= @sales.count %> 件</span>
       </div>
 
-      <% @sales.each do |sale| %>
-        <div class="group flex justify-between items-center bg-gray-50 p-6 rounded-[2rem] border border-gray-100 shadow-inner hover:shadow-lg transition-shadow">
-          <div class="flex items-center gap-5">
-            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-3xl shadow-sm">
+      <div class="timeline-list">
+        <% @sales.each do |sale| %>
+          <div class="timeline-row">
+            <div class="row-icon" style="--icon-bg: <%= sale.item_type == 'item_a' ? '#2563eb' : '#dc2626' %>">
               <%= sale.item_type == 'item_a' ? '🍕' : '🥤' %>
             </div>
-            <div>
-              <div class="text-lg font-black text-gray-900"><%= sale.item_type_jp %></div>
-              <div class="text-[11px] font-bold text-gray-400 flex gap-2">
-                <span class="text-blue-600 uppercase tracking-wider"><%= sale.gender_jp %></span>
-                <span>•</span>
-                <span><%= sale.created_at.strftime("%H:%M") %></span>
+
+            <div class="row-info">
+              <div class="row-name"><%= sale.item_type_jp %></div>
+              <div class="row-meta">
+                <span class="meta-gender"><%= sale.gender_jp %></span>
+                <span class="meta-dot">·</span>
+                <span class="meta-time"><%= sale.created_at.strftime("%H:%M") %></span>
               </div>
             </div>
+
+            <div class="row-right">
+              <div class="row-price">¥<%= sale.price %></div>
+              <%= button_to sale_path(sale), method: :delete,
+                data: { confirm: "削除しますか？" },
+                class: "row-delete" do %>
+                ✕
+              <% end %>
+            </div>
           </div>
-          <div class="flex flex-col items-end gap-3">
-            <div class="text-lg font-black text-gray-950 tracking-tight">¥<%= sale.price %></div>
-            <%= button_to sale_path(sale), method: :delete, data: { confirm: "削除しますか？" }, class: "opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-bold bg-rose-50 text-rose-500 px-4 py-1 rounded-full shadow-sm" do %>
-              DELETE
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    </div>
+        <% end %>
+      </div>
+    </section>
+
   </div>
 </div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,900&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .mgmt-root {
+    min-height: 100svh;
+    background: #0a0a0f;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px;
+    padding-bottom: 40px;
+    position: relative;
+    overflow-x: hidden;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .mgmt-bg {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 80% 10%, #1e3a8a33 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% 90%, #7c3aed22 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .mgmt-card {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+    margin-top: 8px;
+  }
+
+  /* HEADER */
+  .mgmt-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .mgmt-back {
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border: 2px solid #ffffff;
+    box-shadow: 3px 3px 0 #facc15;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #0a0a0f;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: all 0.1s ease;
+  }
+
+  .mgmt-back:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 #facc15;
+  }
+
+  .mgmt-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .mgmt-logo-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .mgmt-logo-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: #0a0a0f;
+    background: #22c55e;
+    padding: 3px 7px;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .mgmt-logo-tag::before {
+    content: '●';
+    font-size: 0.5rem;
+    margin-right: 4px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* REVENUE PANEL */
+  .mgmt-revenue {
+    background: #ffffff;
+    border: 3px solid #ffffff;
+    box-shadow: 6px 6px 0 #facc15;
+    border-radius: 2px;
+    padding: 28px 28px 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mgmt-revenue::after {
+    content: '¥';
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 8rem;
+    color: #0a0a0f;
+    opacity: 0.04;
+    line-height: 1;
+  }
+
+  .rev-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+
+  .rev-amount {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 14vw, 4.5rem);
+    color: #0a0a0f;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .rev-sub {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+  }
+
+  /* TIMELINE */
+  .mgmt-timeline {
+    background: #ffffff;
+    border: 3px solid #ffffff;
+    box-shadow: 6px 6px 0 #334155;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 2px solid #f1f5f9;
+    background: #f8fafc;
+  }
+
+  .timeline-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #0a0a0f;
+    letter-spacing: 0.02em;
+  }
+
+  .timeline-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+  }
+
+  .timeline-list {
+    max-height: 60svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+  }
+
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.1s;
+  }
+
+  .timeline-row:last-child { border-bottom: none; }
+
+  .timeline-row:active { background: #f8fafc; }
+
+  .row-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--icon-bg);
+    border: 2px solid #0a0a0f;
+    border-radius: 2px;
+    box-shadow: 2px 2px 0 #0a0a0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .row-info { flex: 1; min-width: 0; }
+
+  .row-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0a0a0f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .row-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .meta-gender {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2563eb;
+    letter-spacing: 0.05em;
+  }
+
+  .meta-dot { color: #cbd5e1; font-size: 0.6rem; }
+
+  .meta-time {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+  }
+
+  .row-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .row-price {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: #0a0a0f;
+    letter-spacing: -0.01em;
+  }
+
+  .row-delete {
+    background: none;
+    border: 1.5px solid #fca5a5;
+    color: #ef4444;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.1s;
+    line-height: 1.4;
+  }
+
+  .row-delete:active {
+    background: #fee2e2;
+    border-color: #ef4444;
+  }
+
+  @media (hover: hover) {
+    .mgmt-back:hover { background: #facc15; border-color: #facc15; }
+    .timeline-row:hover { background: #f8fafc; }
+    .row-delete:hover { background: #fee2e2; border-color: #ef4444; }
+  }
+</style>

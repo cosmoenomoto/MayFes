@@ -1,65 +1,384 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-indigo-900 p-4 md:p-10 flex flex-col justify-center items-center">
-  
-  <div class="w-full max-w-xl bg-white/95 backdrop-blur-sm p-10 rounded-[2.5rem] shadow-2xl border border-white/20">
+<div class="pos-root">
+  <div class="pos-bg"></div>
 
-    <header class="text-center mb-10">
-      <h1 class="text-5xl md:text-6xl font-black text-gray-950 tracking-tighter italic">MAY POS</h1>
-      <div class="mt-1 bg-gray-950 text-white px-4 py-1.5 rounded-full text-xs font-bold inline-block tracking-widest animate-pulse">2026 Fest</div>
+  <div class="pos-card">
+    <header class="pos-header">
+      <div class="pos-logo">
+        <span class="pos-logo-main">MAY POS</span>
+        <span class="pos-logo-badge">2026 FEST</span>
+      </div>
     </header>
 
     <% if notice %>
-      <div class="fixed top-6 left-1/2 -translate-x-1/2 w-96 z-50 bg-gray-950/90 text-white shadow-2xl border border-white/20 p-5 rounded-2xl flex items-center gap-4 animate-bounce text-center">
-        <span class="text-3xl text-green-400">⚡</span>
-        <span class="text-sm font-bold tracking-wider"><%= notice %></span>
+      <div class="pos-notice">
+        <span class="pos-notice-icon">⚡</span>
+        <span><%= notice %></span>
       </div>
     <% end %>
 
-    <div class="mb-10 text-center">
-      <p class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-widest">Recent Sales Feed</p>
-      <div class="flex gap-3 justify-center overflow-x-auto pb-2">
+    <section class="pos-feed">
+      <p class="pos-feed-label">RECENT SALES</p>
+      <div class="pos-feed-scroll">
         <% @sales.first(5).each do |s| %>
-          <div class="flex-shrink-0 bg-blue-50 border border-blue-100 px-4 py-3 rounded-2xl shadow-sm text-xs font-black">
-            <span class="text-blue-700"><%= s.item_type_jp %></span>
-            <span class="text-blue-300 mx-2">|</span>
-            <span class="text-gray-600"><%= s.gender_jp %></span>
+          <div class="pos-feed-chip">
+            <span class="chip-type"><%= s.item_type_jp %></span>
+            <span class="chip-sep">/</span>
+            <span class="chip-gender"><%= s.gender_jp %></span>
           </div>
         <% end %>
       </div>
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 gap-8">
-      <% [
-        { name: '商品A', type: 'item_a', price: 500, color: 'from-blue-600 via-blue-700 to-indigo-800' },
-        { name: '商品B', type: 'item_b', price: 700, color: 'from-rose-600 via-rose-700 to-red-800' }
-      ].each do |item| %>
-        
-        <div class="bg-gray-50 p-8 rounded-[2rem] border border-gray-100 shadow-inner">
-          <div class="flex justify-between items-center mb-6 px-3">
-            <span class="text-3xl font-black text-gray-950 italic"><%= item[:name] %></span>
-            <span class="bg-white px-5 py-2.5 rounded-full text-lg font-black text-gray-800 shadow-sm border border-gray-100 tracking-tight"><%= item[:price] %>円</span>
+    <% [
+      { name: '商品A', type: 'item_a', price: 500, accent: '#2563eb', emoji: '🍕' },
+      { name: '商品B', type: 'item_b', price: 700, accent: '#dc2626', emoji: '🥤' }
+    ].each do |item| %>
+      <section class="pos-item" style="--accent: <%= item[:accent] %>">
+        <div class="pos-item-header">
+          <div class="pos-item-title">
+            <span class="item-emoji"><%= item[:emoji] %></span>
+            <span class="item-name"><%= item[:name] %></span>
           </div>
+          <div class="pos-item-price">¥<%= item[:price] %></div>
+        </div>
 
-          <div class="grid grid-cols-2 gap-5">
-            <% [ ['male', '♂ 男'], ['female', '♀ 女'] ].each do |g_key, g_name| %>
-              <% [ ['young', '10-20'], ['adult', '30+'] ].each do |a_key, a_name| %>
-                <%= button_to sales_path(sale: { item_type: item[:type], gender: g_key, age_group: a_key, price: item[:price] }), 
-                    class: "relative overflow-hidden bg-gradient-to-br #{item[:color]} text-white p-8 rounded-3xl shadow-xl active:scale-95 transition-all text-left group min-h-[140px]" do %>
-                  <div class="text-sm opacity-80 font-bold mb-1 tracking-wider"><%= a_name %></div>
-                  <div class="text-lg font-black tracking-tight"><%= g_name %></div>
-                  
-                  <div class="absolute -right-2 -bottom-2 text-6xl opacity-10 group-hover:scale-125 transition-transform">💰</div>
-                <% end %>
+        <div class="pos-grid">
+          <% [ ['male', '♂ 男'], ['female', '♀ 女'] ].each do |g_key, g_name| %>
+            <% [ ['young', '10代・20代'], ['adult', '30代以上'] ].each do |a_key, a_name| %>
+              <%= button_to sales_path(sale: {
+                item_type: item[:type],
+                gender: g_key,
+                age_group: a_key,
+                price: item[:price]
+              }), class: "pos-btn" do %>
+                <span class="btn-age"><%= a_name %></span>
+                <span class="btn-gender"><%= g_name %></span>
+                <span class="btn-arrow">→</span>
               <% end %>
             <% end %>
-          </div>
+          <% end %>
         </div>
-      <% end %>
-    </div>
+      </section>
+    <% end %>
 
-    <div class="mt-16 mb-6 text-center px-4">
-      <%= link_to manage_sales_path, class: "inline-flex items-center justify-center gap-3 bg-gray-950 text-white w-full py-5 rounded-[2rem] font-black shadow-2xl hover:bg-black transition-colors" do %>
-        📊 <span class="text-sm uppercase tracking-widest">全売上レポートを表示</span>
+    <div class="pos-footer">
+      <%= link_to manage_sales_path, class: "pos-manage-btn" do %>
+        <span class="manage-icon">📊</span>
+        <span>全売上レポートを表示</span>
+        <span class="manage-arrow">↗</span>
       <% end %>
     </div>
   </div>
 </div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,900&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .pos-root {
+    min-height: 100svh;
+    background: #0a0a0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .pos-bg {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 0%, #1e3a8a44 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 100%, #7c3aed33 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .pos-card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 0;
+    border: 3px solid #0a0a0f;
+    box-shadow: 8px 8px 0 #0a0a0f;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .pos-header {
+    background: #0a0a0f;
+    padding: 20px 24px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pos-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .pos-logo-main {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .pos-logo-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: #0a0a0f;
+    background: #facc15;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  /* NOTICE */
+  .pos-notice {
+    background: #16a34a;
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    animation: slideDown 0.3s ease;
+  }
+  .pos-notice-icon { font-size: 1.2rem; }
+
+  @keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* FEED */
+  .pos-feed {
+    padding: 16px 24px 12px;
+    border-bottom: 2px solid #f1f5f9;
+    background: #f8fafc;
+  }
+
+  .pos-feed-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: #94a3b8;
+    margin-bottom: 10px;
+  }
+
+  .pos-feed-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .pos-feed-scroll::-webkit-scrollbar { display: none; }
+
+  .pos-feed-chip {
+    flex-shrink: 0;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    padding: 5px 12px;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: border-color 0.15s;
+  }
+
+  .chip-type { color: #1e40af; }
+  .chip-sep { color: #cbd5e1; font-size: 0.6rem; }
+  .chip-gender { color: #475569; }
+
+  /* ITEM SECTION */
+  .pos-item {
+    padding: 20px 24px;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .pos-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .pos-item-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .item-emoji {
+    width: 40px;
+    height: 40px;
+    background: var(--accent);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    border: 2px solid #0a0a0f;
+    box-shadow: 2px 2px 0 #0a0a0f;
+    flex-shrink: 0;
+  }
+
+  .item-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: #0a0a0f;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .pos-item-price {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #0a0a0f;
+    background: #facc15;
+    padding: 4px 12px;
+    border: 2px solid #0a0a0f;
+    box-shadow: 2px 2px 0 #0a0a0f;
+    line-height: 1.2;
+    border-radius: 2px;
+  }
+
+  /* GRID BUTTONS */
+  .pos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .pos-btn {
+    background: none;
+    border: 2px solid #0a0a0f;
+    box-shadow: 3px 3px 0 #0a0a0f;
+    border-radius: 2px;
+    padding: 16px 14px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.1s ease;
+    background: #fff;
+    min-height: 90px;
+  }
+
+  .pos-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .pos-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 #0a0a0f;
+  }
+
+  .pos-btn:active::before { opacity: 1; }
+  .pos-btn:active .btn-age,
+  .pos-btn:active .btn-gender { color: #fff; }
+
+  .btn-age {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+    transition: color 0.1s;
+  }
+
+  .btn-gender {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: #0a0a0f;
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 1;
+    transition: color 0.1s;
+  }
+
+  .btn-arrow {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 900;
+    opacity: 0.5;
+    z-index: 1;
+  }
+
+  /* FOOTER */
+  .pos-footer {
+    padding: 20px 24px;
+    background: #f8fafc;
+  }
+
+  .pos-manage-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    background: #0a0a0f;
+    color: #fff;
+    padding: 16px 24px;
+    border: 2px solid #0a0a0f;
+    box-shadow: 4px 4px 0 #334155;
+    border-radius: 2px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: all 0.1s ease;
+  }
+
+  .pos-manage-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 #334155;
+  }
+
+  .manage-icon { font-size: 1.1rem; }
+  .manage-arrow { margin-left: auto; font-size: 1.1rem; }
+
+  /* Hover states for non-touch */
+  @media (hover: hover) {
+    .pos-btn:hover::before { opacity: 0.08; }
+    .pos-btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 #0a0a0f; }
+    .pos-manage-btn:hover { background: #1e293b; }
+    .pos-feed-chip:hover { border-color: #94a3b8; }
+  }
+</style>
